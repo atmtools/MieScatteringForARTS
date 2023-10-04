@@ -1,0 +1,14 @@
+*.xml
+*.xml.bin
+*.dat
+*.txt
+ReadMe_*
+*-workspace
+/old/*
+/.vscode/*
+/.idea/*
+/__pycache__/*
+.DS*
+*-checkpoint.py
+*.err
+*.out
