@@ -8,7 +8,7 @@ Created on Fri Apr  8 16:30:11 2022
 
 import numpy as np
 from scipy.interpolate import interp1d
-from pyarts.arts import constant
+from pyarts.arts import constants
 
 import pyarts.arts as pa
 import pyarts.xml as xml
@@ -1303,7 +1303,7 @@ def refactive_index_water_segelstein(frequency, return_rawdata=False):
         ])
 
 
-    f_data=constant.c/(data[:,0]*1e-6)
+    f_data=constants.c/(data[:,0]*1e-6)
     n_data=data[:,1:]
 
     if return_rawdata:

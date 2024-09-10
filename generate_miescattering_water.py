@@ -24,11 +24,11 @@ import aux_function as af
 # =============================================================================
 
 #speed of light
-c0=arts.constant.c #[m/s]
+c0=arts.constants.c #[m/s]
 
 #angular grid
 # za_grid = np.linspace(0,180,721)
-za_grid = gmf.create_angular_grid(1441,k=5)
+za_grid = gmf.create_angular_grid(721,k=5)
 
 #frequency range
 f_min=1e9 # Hz =>30 cm Wavelength
@@ -71,15 +71,15 @@ ref_index_text=('Segelstein, David J.\n'
 smoothing_window_size=2.5
 
 #plot results ?
-plotting=False
+plotting=True
 
 #Samples per subdomain
 N_sub=1
 
 
-datafolder=f'scattering_data/visible/{material}/'
-datafolder_arrayformat=f'scattering_data/visible/ArrayFormat/{material}/'
-plotfolder=f'plots/visible/{material}/'
+datafolder=f'../scattering_data/fullrange/{material}/'
+datafolder_arrayformat=f'../scattering_data/fullrange/ArrayFormat/{material}/'
+plotfolder=f'../plots/fullrange/{material}/'
 
 
 
@@ -239,7 +239,7 @@ ssd_array_sqr.append(ssd_array)
 smd_array_sqr.append(smd_array)
 
 
-xml.save(ssd_array_sqr, os.path.join(datafolder_arrayformat,f'MieSpheres_{material}.data.xml'),format='binary')
+xml.save(ssd_array_sqr, os.path.join(datafolder_arrayformat,f'MieSpheres_{material}.xml'),format='binary')
 xml.save(smd_array_sqr, os.path.join(datafolder_arrayformat,f'MieSpheres_{material}.meta.xml'),format='binary')
 
 

@@ -127,7 +127,7 @@ def calc_mie_scattering(radius, frequency, za_grid, m, smoothing_window_size=0.,
     '''
 
     #speed of light
-    c0=arts.constant.c #[m/s]
+    c0=arts.constants.c #[m/s]
 
     #Create calculation grid
     index=np.arange(0,len(za_grid))
@@ -268,7 +268,7 @@ def calc_arts_scattering_data(f_grid,t_grid,za_grid, droplet_radius, r_sub_fac, 
     source='miepython 2.2.3: https://pypi.org/project/miepython/'
 
     #speed of light
-    c0=arts.constant.c #[m/s]
+    c0=arts.constants.c #[m/s]
 
     #calculate size parameter
     x=2*np.pi*droplet_radius*f_grid/c0
@@ -453,7 +453,7 @@ def mie_size_parameter(radius, quantity, qtype='frequency'):
 
     if qtype=='frequency':
         #speed of light
-        c0=arts.constant.c #[m/s]
+        c0=arts.constants.c #[m/s]
 
         inv_wavelength=quantity/c0
 
@@ -484,7 +484,7 @@ def mie_size_parameter2radius(x, quantity, qtype='frequency'):
 
     if qtype=='frequency':
         #speed of light
-        c0=arts.constant.c #[m/s]
+        c0=arts.constants.c #[m/s]
 
         wavelength=c0/quantity
 
