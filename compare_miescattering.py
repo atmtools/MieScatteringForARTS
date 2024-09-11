@@ -15,7 +15,7 @@ import pyarts.xml as xml
 import refractive_index_of_H2O_segelstein as refs
 import refractive_index_of_H2O_Liebe93 as refl
 import aux_function as af
-import generate_miescattering_data as gmd
+import generate_miescattering_functions as gmd
 
 
 # =============================================================================
@@ -24,7 +24,9 @@ import generate_miescattering_data as gmd
 
 material='H2O_liquid'
 
-arts_scat_data_folder='../arts_dev/arts-xml-data/scattering/'
+home=os.environ["HOME"]
+
+arts_scat_data_folder=f'{home}/.cache/arts/arts-xml-data-2.6.6/scattering/'
 
 
 
@@ -79,7 +81,7 @@ droplet_radius=smd_arts.diameter_volume_equ/2
 rho_water=1000.
 
 #speed of light
-c0=arts.constant.c #[m/s]
+c0=arts.constants.c #[m/s]
 
 #size parameter
 x=2*np.pi*droplet_radius*f_grid/c0
@@ -188,8 +190,8 @@ for i,fidx_i in enumerate(freq_idx):
 
 
 
-phfct_integral_mie,phfct_integral_mie_test= gmd.integrate_phasefunction(ssd_mie)
-phfct_integral_arts,phfct_integral_arts_test = gmd.integrate_phasefunction(ssd_arts, t_index=-1)
+phfct_integral_mie,phfct_integral_mie_test= gmd.integrate_phasefunction_for_testing(ssd_mie)
+phfct_integral_arts,phfct_integral_arts_test = gmd.integrate_phasefunction_for_testing(ssd_arts, t_index=-1)
 
 
 fig, ax=af.default_figure(1, 1)

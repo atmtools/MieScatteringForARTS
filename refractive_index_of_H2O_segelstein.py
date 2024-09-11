@@ -1322,29 +1322,9 @@ def refactive_index_water_segelstein(frequency, return_rawdata=False):
 
 if __name__ == "__main__":
 
-
-    # frequency=np.logspace(6, 19,1000)
-
-    # n_real, n_imag =refactive_index_water_segelstein(frequency)
-
-    # import matplotlib.pyplot as plt
-
-    # plt.figure()
-    # plt.semilogx(constants.c/frequency,n_real)
-    # plt.semilogx(constants.c/frequency,n_imag)
-
-
     f_raw, n_raw =refactive_index_water_segelstein([],return_rawdata=True)
 
     n_new=np.reshape(n_raw,(np.size(n_raw,axis=0),1,np.size(n_raw,axis=1)))
-
-
-    # data=xr.DataArray(n_new,
-    #                   dims=("Frequency","Temperature","Complex"),
-    #                   coords={"Frequency":f_raw, "Temperature": np.array([303.15]), "Complex":["real", "imaginary"]})
-
-
-    # test=pa.GriddedField2.from_xarray(data)
 
     data=pa.GriddedField3()
     data.data=n_new

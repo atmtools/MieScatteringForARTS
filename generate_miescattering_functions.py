@@ -101,6 +101,51 @@ def S1S2ToPhaseMatSphere(S11,S22):
     return P, P_coeffs
 
 
+def small_mie_S1_S2(m, x, mu):
+    """
+    Calculate the scattering amplitude functions for small spheres (x<0.1).
+
+    The amplitude functions have been normalized so that when integrated
+    over all 4*pi solid angles, the integral will be qext*pi*x**2.
+
+    The units are weird, sr**(-0.5)
+
+    THIS FUNCTION IS TAKEN FROM MIEPYTHON VERSION 2.2.3
+    AS IT IS NOT AVAILABLE IN THE CURRENT VERSION 2.5.4
+
+    Args:
+        m: the complex index of refraction of the sphere
+        x: the size parameter of the sphere
+        mu: the angles, cos(theta), to calculate scattering amplitudes
+
+    Returns:
+        S1, S2: the scattering amplitudes at each angle mu [sr**(-0.5)]
+    """
+    m2 = m * m
+    m4 = m2 * m2
+    x2 = x * x
+    x3 = x2 * x
+    x4 = x2 * x2
+
+    D = m2 + 2 + (1 - 0.7 * m2) * x2
+    D -= (8 * m4 - 385 * m2 + 350) * x4 / 1400.0
+    D += 2j * (m2 - 1) * x3 * (1 - 0.1 * x2) / 3
+    ahat1 = 2j * (m2 - 1) / 3 * (1 - 0.1 * x2 + (4 * m2 + 5) * x4 / 1400) / D
+    bhat1 = 1j * x2 * (m2 - 1) / 45 * (1 + (2 * m2 - 5) / 70 * x2)
+    bhat1 /= 1 - (2 * m2 - 5) / 30 * x2
+    ahat2 = 1j * x2 * (m2 - 1) / 15 * (1 - x2 / 14)
+    ahat2 /= 2 * m2 + 3 - (2 * m2 - 7) / 14 * x2
+
+    S1 = 1.5 * x3 * (ahat1 + bhat1 * mu + 5 / 3 * ahat2 * mu)
+    S2 = 1.5 * x3 * (bhat1 + ahat1 * mu + 5 / 3 * ahat2 * (2 * mu**2 - 1))
+
+    # norm = sqrt(qext*pi*x**2)
+    norm = np.sqrt(np.pi * 6 * x**3 * (ahat1 + bhat1 + 5 * ahat2 / 3).real)
+    S1 /= norm
+    S2 /= norm
+
+    return [S1, S2]
+
 
 def calc_mie_scattering(radius, frequency, za_grid, m, smoothing_window_size=0.,
                         oversampling=10, verbose=False ):
@@ -140,7 +185,6 @@ def calc_mie_scattering(radius, frequency, za_grid, m, smoothing_window_size=0.,
 
 
     #cosine of angular grids
-    mu = np.cos(za_rad)
     mu_hr = np.cos(za_rad_hr)
 
     #Size parameter
@@ -164,12 +208,14 @@ def calc_mie_scattering(radius, frequency, za_grid, m, smoothing_window_size=0.,
     #Wiscombe’s paper and has been tested for several complex indices of refraction.
     #Wiscombe uses this when np.abs(m)*x<=0.1."
     if np.abs(m)*x<=0.1:
-        S1_hr,S2_hr=miepython.miepython._small_mie_S1_S2(m, x, mu_hr)
         qext, qsca, qback, g = miepython.miepython._small_mie(m, x)
-    else:
-        S1_hr,S2_hr=miepython.mie_S1_S2(m, x, mu_hr)
-        qext, qsca, qback, g = miepython.mie(m,x)
 
+        #Here we use the small sphere approximation for the scattering amplitudes taken from
+        #MiePython version 2.2.3
+        S1_hr,S2_hr=small_mie_S1_S2(m, x, mu_hr)
+    else:        
+        qext, qsca, qback, g = miepython.mie(m,x)
+        S1_hr,S2_hr=miepython.mie_S1_S2(m, x, mu_hr)
 
 
     #map scattering amplitudes to ARTS phase mat of total random particles
@@ -211,8 +257,6 @@ def calc_mie_scattering(radius, frequency, za_grid, m, smoothing_window_size=0.,
         #Interpolate on input grid
         F_int=interp1d(za_grid_hr, P_sm, axis=0)
 
-
-
     else:
 
         #Interpolate on input grid
@@ -221,9 +265,9 @@ def calc_mie_scattering(radius, frequency, za_grid, m, smoothing_window_size=0.,
     P=F_int(za_grid)
 
     #assure that the integral of the phase function (P[:,0]) over 4*pi is one.
-    P/=np.trapz(P[:,0]*np.sin(za_rad), x=za_rad)
+    P/=np.trapz(P[:,0]*np.sin(za_rad), x=za_rad)*2*np.pi
 
-
+   
     #Normalize it to ARTS convention
     P=P*qsca*sigma_geo
 
@@ -259,13 +303,47 @@ def calc_mie_scattering(radius, frequency, za_grid, m, smoothing_window_size=0.,
 
 
 
-def calc_arts_scattering_data(f_grid,t_grid,za_grid, droplet_radius, r_sub_fac, m, rho, ignore_limit=False,
-                              ref_index_text=''):
+def calc_arts_scattering_data(f_grid,t_grid,za_grid, droplet_radius, r_sub_fac, m, rho, ignore_limit=False, ref_index_text=''):                              
+    """
+    Calculate the scattering data for ARTS (Atmospheric Radiative Transfer Simulator) using miepython for spherical particles.
 
+    Parameters:
+    - f_grid (array-like): Frequency grid.
+    - t_grid (array-like): Temperature grid.
+    - za_grid (array-like): Zenith angle grid.
+    - droplet_radius (float): Radius of the droplet.
+    - r_sub_fac (array-like): Subdomain factor.
+    - m (array-like): Refractive index.
+    - rho (float): Density of the droplet.
+    - ignore_limit (bool, optional): Flag to ignore the size parameter limit. Defaults to False.
+    - ref_index_text (str, optional): Reference index text. Defaults to ''.
+
+    Returns:
+    - ssd (arts.SingleScatteringData): Single scattering data.
+    - smd (arts.ScatteringMetaData): Scattering meta data.
+    - P_coeffs (list): List of P coefficients.
+
+    Raises:
+    - None
+
+    Notes:
+    - This function calculates the scattering data for ARTS using Mie scattering theory. It generates the single scattering data (ssd) and scattering meta data (smd) objects, as well as the list of P coefficients (P_coeffs).
+    - The size parameter limit is set to x < 10000 by default, but can be ignored by setting ignore_limit to True.
+    - The refractive index is calculated based on the given refractive index values (m).
+    - The function prints information about the size parameter, Csca data, Csca, and albedo deviation for each frequency.
+    - The size description is generated based on the droplet radius and subdomain factor.
+    - The scattering meta data includes the description, diameter area equivalent aerodynamical, maximum diameter, diameter volume equivalent, mass, refractive index, and source.
+
+    References:
+    - Mie scattering theory: https://en.wikipedia.org/wiki/Mie_scattering
+    - ARTS: https://www.radiativetransfer.org/
+    - miepython: https://github.com/scottprahl/miepython/
+    """
 
     description=("Spherical particle of liquid water generated using\n"+
                  f"miepython and python by Manfred Brath, {date.today()}\n")
-    source='miepython 2.2.3: https://pypi.org/project/miepython/'
+    
+    source=f'miepython {miepython.__version__}: https://github.com/scottprahl/miepython/'
 
     #speed of light
     c0=arts.constants.c #[m/s]
@@ -391,23 +469,26 @@ def calc_arts_scattering_data(f_grid,t_grid,za_grid, droplet_radius, r_sub_fac, 
     return ssd, smd, P_coeffs
 
 
-def integrate_phasefunction(ssd,t_index=0):
+def integrate_phasefunction_for_testing(ssd,t_index=0):
     """
+    Calculates the integral of the phase function over the zenith angle grid.
 
+    IMPORTANT: This function is intended for testing purposes only.
+    As there is no integration over azimuth the integral should close to 2 and not 4*pi.
 
-    Args:
-        ssd (TYPE): DESCRIPTION.
-        t_index (TYPE, optional): DESCRIPTION. Defaults to 0.
-
+    Parameters:
+        ssd (object): The scattering data object.
+        t_index (int, optional): The index of the time step. Default is 0.
     Returns:
-        phfct_integral (TYPE): DESCRIPTION.
-        phfct_integral_test (TYPE): DESCRIPTION.
+        tuple: A tuple containing two arrays. The first array represents the integral of the phase function
+                over the zenith angle grid for each frequency, and the second array represents the integral
+                calculated using a numerical approximation.
 
     """
 
 
-    phfct_integral=np.ones(len(ssd.f_grid))*2
-    phfct_integral_test=np.ones(len(ssd.f_grid))*2
+    phfct_integral=np.ones(len(ssd.f_grid))*np.nan
+    phfct_integral_test=np.ones(len(ssd.f_grid))*np.nan
 
     for i,f_i in enumerate(ssd.f_grid):
 
@@ -416,8 +497,6 @@ def integrate_phasefunction(ssd,t_index=0):
         sca=ssd.ext_mat_data[i,t_index,0,0,0]-ssd.abs_vec_data[i,t_index,0,0,0]
 
         if sca>0:
-
-
 
             phfct=ssd.pha_mat_data[i,t_index,:,0,0,0,0]*4*np.pi/sca
             za_rad=ssd.za_grid*np.pi/180
@@ -467,7 +546,7 @@ def mie_size_parameter(radius, quantity, qtype='frequency'):
 
 def mie_size_parameter2radius(x, quantity, qtype='frequency'):
     """
-    Calculates mie size parameter either from frequency or from wavelength
+    Calculates radius from mie size parameter and either from frequency or from wavelength
 
     Args:
         x (float or ndarray): Size parameter.

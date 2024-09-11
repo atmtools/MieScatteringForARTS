@@ -199,7 +199,7 @@ for i, r_i in enumerate(droplet_radii):
 
 
         ##plot phase function normalization derivation
-        phfct_integral_mie, _ = gmf.integrate_phasefunction(ssd)
+        phfct_integral_mie, _ = gmf.integrate_phasefunction_for_testing(ssd)
 
         fig, ax=af.default_figure(1, 1)
         ax.semilogx(c0/f_grid_ssd*1e9,(phfct_integral_mie/2-1)*100,'+-',label='Miepython SSD')
