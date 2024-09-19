@@ -1,10 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 16 15:20:57 2022
+Script: generate_miescattering_water
 
-@author: u242031
+This module calculates the Mie scattering properties of water droplets using the 
+miepython library. It generates scattering data and plots various optical properties 
+such as extinction and absorption cross sections, as well as phase functions. 
+The results are saved in XML format.
+
+Key functionalities include:
+- Defining physical constants and parameters for the scattering calculations.
+- Generating droplet radii and refractive indices for ice.
+- Performing Mie scattering calculations for a range of frequencies and droplet sizes.
+- Optional plotting the results, including phase matrices and optical properties.
+- Saving the scattering data in a structured XML format.
+
+Author: Manfred Brath
+Created on: Wed Feb 16 15:20:57 2022
+
 """
+
+
+
 import os
 import numpy as np
 import time

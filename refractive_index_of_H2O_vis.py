@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Module: refractive_index_of_H2O_vis
+
+Module for calculating the refractive index of water and steam as a 
+function of wavelength, temperature, and density. This module provides a 
+function to compute the complex refractive index of water based on the 
+revised formulation from the Journal of Physical and Chemical Reference 
+Data. It checks the validity of input parameters and returns the 
+refractive index along with a boolean array indicating valid input 
+ranges.
+
+Functions
+---------
+refractive_index_water(wavelength, T, rho_water):
+
 Created on Fri Mar 11 17:24:39 2022
-
-@author: u242031
-
-
-
+Author: Manfred Brath
 """
 
 

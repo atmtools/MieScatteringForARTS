@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr  8 16:30:11 2022
+Module: refractive_index_of_H2O_segelstein
 
-@author: u242031
+This module provides a function to calculate the complex refractive index of water
+based on the work of David J. Segelstein. It utilizes interpolation methods to 
+provide accurate refractive index values across a range of frequencies. The 
+function can return both the real and imaginary components of the refractive index 
+for further analysis in scientific applications.
+
+Created on Fri Apr  8 16:30:11 2022
+Author: Manfred Brath
 """
 
 import numpy as np
@@ -1335,7 +1342,7 @@ if __name__ == "__main__":
 
     test=xml.load('complex_refr_indexWaterSegelstein81_data.xml')
 
-    test2=pa.GriddedField3.to_xarray(test)
+    
 
 #%%
 

@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 16 15:20:57 2022
+Script: compare_miescattering
 
-@author: u242031
+This module compares Mie scattering data with ARTS scattering data for liquid water (H2O).
+It loads scattering data from XML files, calculates scattering coefficients, and plots
+the results, including extinction, scattering, and absorption cross sections. The user
+can select the particle size and refractive index model for the calculations. The module
+also evaluates phase matrix elements and integrates the phase function for further analysis.
+
+Created on Wed Feb 16 15:20:57 2022
+Author: Manfred Brath
 """
 import os
 import numpy as np
@@ -87,14 +94,24 @@ c0=arts.constants.c #[m/s]
 x=2*np.pi*droplet_radius*f_grid/c0
 
 
-#refractive index
-m_rs,m_is = refs.refactive_index_water_segelstein(f_grid)
-ms=m_rs-m_is*1j
-ml=np.sqrt(refl.eps_water_liebe93(f_grid, t_grid))
-ml=np.conj(ml)
+print('\n-----------------------------------------------')
+print('Possible efractive index')
+print('Segelstein 1981 (0)')
+print('Liebe 1993 (1)')
+ref_idx=int(input('\nchoose refractive index ==>>'))
 
+if ref_idx==0:
+    #refractive index seegelstein
+    m_rs,m_is = refs.refactive_index_water_segelstein(f_grid)
+    m=m_rs-m_is*1j
+elif ref_idx++1:
+    #refractive index liebe 93
+    ml=np.sqrt(refl.eps_water_liebe93(f_grid, t_grid))
+    m=np.conj(ml)
+else:
+    raise ValueError('wrong selection')
 
-ssd_mie, smd_mie, P_coeffs = gmd.calc_arts_scattering_data(f_grid,t_grid,za_grid, droplet_radius, [1], ml, rho_water )
+ssd_mie, smd_mie, P_coeffs = gmd.calc_arts_scattering_data(f_grid,t_grid,za_grid, droplet_radius, [1], m, rho_water )
 
 # =============================================================================
 #%% evaluate

@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr  8 16:30:11 2022
+Module: refractive_index_of_ice_warren08
 
-@author: u242031
+This module provides a function to calculate the complex refractive index of ice 
+based on the work of Warren and Brandt (2008). The refractive index is given for a 
+temperature of 266 K and is applicable across a range of frequencies.
+
+Function:
+    refactive_index_ice_warren08(frequency, return_rawdata=False)
+
+Created on Fri Apr  8 16:30:11 2022
+Author: Manfred Brath
 """
 
 import numpy as np
 from scipy.interpolate import interp1d
-from typhon.physics import constants
 
 import pyarts.arts as pa
 import pyarts.xml as xml
@@ -529,7 +536,7 @@ def refactive_index_ice_warren08(frequency, return_rawdata=False):
         ])
 
 
-    f_data=constants.c/(data[:,0]*1e-6)
+    f_data=pa.constants.c/(data[:,0]*1e-6)
     n_data=data[:,1:]
 
     if return_rawdata:
@@ -556,8 +563,8 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     plt.figure()
-    plt.semilogx(constants.c/frequency,n_real)
-    plt.semilogx(constants.c/frequency,n_imag)
+    plt.semilogx(pa.constants.c/frequency,n_real)
+    plt.semilogx(pa.constants.c/frequency,n_imag)
 
 
     f_raw, n_raw =refactive_index_ice_warren08([],return_rawdata=True)

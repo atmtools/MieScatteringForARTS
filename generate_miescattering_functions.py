@@ -1,9 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 16 15:20:57 2022
+Module: generate_miescattering_functions
 
-@author: u242031
+This module provides functions for calculating Mie scattering properties of spherical particles.
+It includes methods for generating angular grids, calculating phase matrices, and obtaining scattering
+data using the ARTS (Atmospheric Radiative Transfer Simulator) framework. The functions utilize the 
+Mie scattering theory to compute scattering amplitudes, extinction, and absorption cross sections 
+for particles of varying sizes and refractive indices.
+Functions:
+- create_angular_grid: Generates an angular grid for specified units.
+- S1S2ToPhaseMatSphere: Converts scattering amplitude matrices to phase matrices in ARTS format.
+- small_mie_S1_S2: Computes scattering amplitude functions for small spheres.
+- calc_mie_scattering: Calculates Mie scattering phase matrix and cross sections.
+- calc_arts_scattering_data: Computes scattering data for ARTS using Mie scattering theory.
+- integrate_phasefunction_for_testing: Integrates the phase function over the zenith angle grid for testing.
+- The module relies on external libraries such as numpy, miepython, and pyarts.
+- It includes error handling for invalid inputs and provides warnings for potential issues with refractive indices.
+
+Created on Wed Feb 16 15:20:57 2022
+@author: Manfred Brath
+
 """
 
 import warnings
@@ -305,7 +322,8 @@ def calc_mie_scattering(radius, frequency, za_grid, m, smoothing_window_size=0.,
 
 def calc_arts_scattering_data(f_grid,t_grid,za_grid, droplet_radius, r_sub_fac, m, rho, ignore_limit=False, ref_index_text=''):                              
     """
-    Calculate the scattering data for ARTS (Atmospheric Radiative Transfer Simulator) using miepython for spherical particles.
+    Calculate the scattering data for ARTS (Atmospheric Radiative Transfer 
+    Simulator) using miepython for spherical particles.
 
     Parameters:
     - f_grid (array-like): Frequency grid.
@@ -315,7 +333,8 @@ def calc_arts_scattering_data(f_grid,t_grid,za_grid, droplet_radius, r_sub_fac, 
     - r_sub_fac (array-like): Subdomain factor.
     - m (array-like): Refractive index.
     - rho (float): Density of the droplet.
-    - ignore_limit (bool, optional): Flag to ignore the size parameter limit. Defaults to False.
+    - ignore_limit (bool, optional): Flag to ignore the size parameter limit. 
+      Defaults to False.
     - ref_index_text (str, optional): Reference index text. Defaults to ''.
 
     Returns:
@@ -327,12 +346,21 @@ def calc_arts_scattering_data(f_grid,t_grid,za_grid, droplet_radius, r_sub_fac, 
     - None
 
     Notes:
-    - This function calculates the scattering data for ARTS using Mie scattering theory. It generates the single scattering data (ssd) and scattering meta data (smd) objects, as well as the list of P coefficients (P_coeffs).
-    - The size parameter limit is set to x < 10000 by default, but can be ignored by setting ignore_limit to True.
-    - The refractive index is calculated based on the given refractive index values (m).
-    - The function prints information about the size parameter, Csca data, Csca, and albedo deviation for each frequency.
-    - The size description is generated based on the droplet radius and subdomain factor.
-    - The scattering meta data includes the description, diameter area equivalent aerodynamical, maximum diameter, diameter volume equivalent, mass, refractive index, and source.
+    - This function calculates the scattering data for ARTS using Mie 
+      scattering theory. It generates the single scattering data (ssd) and 
+      scattering meta data (smd) objects, as well as the list of P coefficients 
+      (P_coeffs).
+    - The size parameter limit is set to x < 10000 by default, but can be 
+      ignored by setting ignore_limit to True.
+    - The refractive index is calculated based on the given refractive index 
+      values (m).
+    - The function prints information about the size parameter, Csca data, 
+      Csca, and albedo deviation for each frequency.
+    - The size description is generated based on the droplet radius and 
+      subdomain factor.
+    - The scattering meta data includes the description, diameter area 
+      equivalent aerodynamical, maximum diameter, diameter volume equivalent, 
+      mass, refractive index, and source.
 
     References:
     - Mie scattering theory: https://en.wikipedia.org/wiki/Mie_scattering

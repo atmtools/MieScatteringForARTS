@@ -1,48 +1,49 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jun  8 15:08:18 2022
+Module: refractive_index_of_H2O_Liebe93
 
-@author: u242031
+This module provides a function to calculate the complex permittivity of water 
+using the Liebe 1993 model. It allows for the evaluation of permittivity over a 
+range of frequencies and temperatures, with considerations for temperature limits.
+Function:
+    eps_water_liebe93(f, t, modT=0)
+
+Created on Wed Jun  8 15:08:18 2022
+Author: Manfred Brath
+
+
 """
 
 import numpy as np
 
-# EPS_WATER_LIEBE93   Dielectric constant for pure water according to Liebe 93
-#
-#    Provides the complex dielectric constant following the Liebe 1993
-#    paper.
-#
-#    Note that the function *epswater93* solves the same task. This function
-#    was primarily implemented to compare if different versions of the 
-#    mathematical expressions give the same result (which they did). In fact,
-#    this function contains two parallel versions, giving identical
-#    results. This function uses just SI units for input arguments, in 
-#    contrast to *epswater93*.
-#
-#    The actual limits of the parameterisation are not known. Studies
-#    indicated that it degenerates for T<248K (T. Kuhn, WATS study;
-#    J.Mendrok, ESA planet toolbox study). Hence, the following
-#    limits are here applied:
-#      f: [ 10 MHz, 1000 GHz] 
-#      t: [ 248 K, 374 K ]
-#    The modT flags allows a workaround at lower temperatures. Then, epsilon is
-#    set to the one of the lowest allowed temperature (T=248K), i.e. assuming
-#    epsilon to be constant below 248K. 
-#
-# FORMAT    e = eps_water_liebe93( f, t [, modT] )
-#        
-# OUT   e    Complex dielectric constant
-# IN    f    Frequency
-#       t    Temperature
-# OPT   modT flag, whether to use modified t if t<248K (liebe formula 
-#            degenerates at these temperatures). Default is false.
-
-# 2004-10-22   Created by Patrick Eriksson
-# 2013-10-04   Jana Mendrok introduced modT flag
-
-
 def eps_water_liebe93( f, t, modT=0 ):
+    """
+    Calculate the complex permittivity of water using the Liebe 1993 model.
+
+    The actual limits of the parameterisation are not known. Studies
+    indicated that it degenerates for T<248K (T. Kuhn, WATS study;
+    J.Mendrok, ESA planet toolbox study). Hence, the following
+    limits are here applied:
+     f: [ 10 MHz, 1000 GHz] 
+     t: [ 248 K, 374 K ]
+    The modT flags allows a workaround at lower temperatures. Then, epsilon is
+    set to the one of the lowest allowed temperature (T=248K), i.e. assuming
+    epsilon to be constant below 248K. 
+
+    Function was converted from atmlab (matlab code) to Python by Manfred Brath.
+    Originally this function was created by Patrick Eriksson for the atmlab package
+    and modiefied by Jana Mendrok.
+
+    Parameters:
+        f (float or array-like): Frequency in Hz. Valid range is 0.01 to 1000 GHz.
+        t (float or array-like): Temperature in Kelvin. Valid range is 248 to 374 K.
+        modT (bool, optional): If True, modifies the temperature for values below 248 K. Default is 0 (False).
+    Returns:
+        complex: The complex permittivity of water at the given frequency and temperature.
+    Raises:
+        ValueError: If frequency is outside the valid range or if temperature is below 248 K.
+    """
 
 # Expressions directly from the Liebe 93 paper
 

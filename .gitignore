@@ -2,6 +2,7 @@
 *.xml.bin
 *.dat
 *.txt
+*.pdf
 ReadMe_*
 *-workspace
 /old/*
